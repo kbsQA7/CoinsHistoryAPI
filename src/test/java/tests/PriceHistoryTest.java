@@ -63,7 +63,7 @@ public class PriceHistoryTest extends ApiTestBase {
     @Test
     @DisplayName("История цен: дата до 2013 года")
     @Owner("kbsQA7")
-    void tooOldDate() {
+    void historyWithOldDate() {
         String coin = RandomUtils.randomCoin();
         String oldDate = RandomUtils.randomDate(2000, 2012);
 
