@@ -1,0 +1,27 @@
+name: Manual API Test Run
+
+on:
+  workflow_dispatch:  
+
+jobs:
+  run-api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Generate api.properties from secrets
+        run: |
+          echo "api.baseUri=${{ secrets.API_BASE_URI }}" > src/test/resources/api.properties
+          echo "api.basePath=${{ secrets.API_BASE_PATH }}" >> src/test/resources/api.properties
+          echo "api.key=${{ secrets.API_KEY }}" >> src/test/resources/api.properties
+
+      - name: Run tests
+        run: ./gradlew clean test
