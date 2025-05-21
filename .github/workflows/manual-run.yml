@@ -1,16 +1,7 @@
 name: Manual API Test Run
 
 on:
-  workflow_dispatch:
-    inputs:
-      baseUri:
-        description: 'Base URI'
-        required: true
-        default: 'https://stage-commercial-api.workspace.cluster.dropstabservice.com'
-      basePath:
-        description: 'Base Path'
-        required: true
-        default: '/api/v1/coins/history'
+  workflow_dispatch:  # <-- просто разрешает запуск вручную
 
 jobs:
   run-api-tests:
@@ -26,15 +17,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Run tests with env vars
-        env:
-          API_BASE_URI: ${{ github.event.inputs.baseUri }}
-          API_BASE_PATH: ${{ github.event.inputs.basePath }}
-          API_KEY: ${{ secrets.API_KEY }}
+      - name: Generate api.properties from secrets
         run: |
-          echo "api.baseUri=$API_BASE_URI" > src/test/resources/api.properties
-          echo "api.basePath=$API_BASE_PATH" >> src/test/resources/api.properties
-          echo "api.key=$API_KEY" >> src/test/resources/api.properties
+          echo "api.baseUri=${{ secrets.API_BASE_URI }}" > src/test/resources/api.properties
+          echo "api.basePath=${{ secrets.API_BASE_PATH }}" >> src/test/resources/api.properties
+          echo "api.key=${{ secrets.API_KEY }}" >> src/test/resources/api.properties
 
-          ./gradlew clean test
-
+      - name: Run tests
+        run: ./gradlew clean test
