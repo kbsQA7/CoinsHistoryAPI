@@ -11,11 +11,6 @@ on:
         description: 'Base Path'
         required: true
         default: '/api/v1/coins/history'
-      apiKey:
-        description: 'API Key'
-        required: true
-        default: ''
-        type: secret
 
 jobs:
   run-api-tests:
@@ -35,10 +30,11 @@ jobs:
         env:
           API_BASE_URI: ${{ github.event.inputs.baseUri }}
           API_BASE_PATH: ${{ github.event.inputs.basePath }}
-          API_KEY: ${{ github.event.inputs.apiKey }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: |
           echo "api.baseUri=$API_BASE_URI" > src/test/resources/api.properties
           echo "api.basePath=$API_BASE_PATH" >> src/test/resources/api.properties
           echo "api.key=$API_KEY" >> src/test/resources/api.properties
 
           ./gradlew clean test
+
