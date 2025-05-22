@@ -1,59 +1,50 @@
-name: API Test Run
+name: API Tests (Manual + Scheduled)
 
 on:
-  workflow_dispatch:  
+  workflow_dispatch:
+    inputs:
+      baseUri:
+        description: 'Base URI'
+        required: true
+        default: 'https://stage-commercial-api.workspace.cluster.dropstabservice.com'
+      basePath:
+        description: 'Base Path'
+        required: true
+        default: '/api/v1/coins/history'
   schedule:
-    - cron: '0 * * * *'  
+    - cron: '0 * * * *' 
 
 jobs:
   run-api-tests:
     runs-on: ubuntu-latest
 
-    env:
-      API_BASE_URI: ${{ secrets.API_BASE_URI }}
-      API_BASE_PATH: ${{ secrets.API_BASE_PATH }}
-      API_KEY: ${{ secrets.API_KEY }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Gradle wrapper permissions
-        run: chmod +x ./gradlew
-
-      - name: Inject test config
+      - name: Generate api.properties from inputs/secrets
         run: |
-          mkdir -p src/test/resources
-          echo "api.baseUri=$API_BASE_URI" > src/test/resources/api.properties
-          echo "api.basePath=$API_BASE_PATH" >> src/test/resources/api.properties
-          echo "api.key=$API_KEY" >> src/test/resources/api.properties
+          echo "api.baseUri=${{ github.event.inputs.baseUri || 'https://stage-commercial-api.workspace.cluster.dropstabservice.com' }}" > src/test/resources/api.properties
+          echo "api.basePath=${{ github.event.inputs.basePath || '/api/v1/coins/history' }}" >> src/test/resources/api.properties
+          echo "api.key=${{ secrets.API_KEY }}" >> src/test/resources/api.properties
 
-      - name: Run API tests
+      - name: Run tests
         run: ./gradlew clean test
 
-      - name: Generate Allure report
-        run: ./gradlew allureReport
-
-      - name: Upload Allure report
+      - name: Upload Allure results
         uses: actions/upload-artifact@v3
         with:
-          name: allure-report
-          path: build/reports/allure-report
-
-      - name: Notify Telegram
-        if: always()
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          STATUS=$([[ "${{ job.status }}" == "success" ]] && echo "✅ API tests passed" || echo "❌ API tests failed")
-          curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage \
-            -d chat_id=$TELEGRAM_CHAT_ID \
-            -d text="🔔 $STATUS\nRepo: *${{ github.repository }}*\nBranch: \`${{ github.ref_name }}\`\nTime: $(date -u +"%Y-%m-%d %H:%M UTC")" \
-            -d parse_mode=Markdown
+          name: allure-results
+          path: build/allure-results
+          
+       - name: Send result to Telegram
+         run: |
+           curl -s -X POST https://api.telegram.org/bot${{ secrets.TG_BOT_TOKEN }}/sendMessage \
+           -d chat_id=${{ secrets.TG_CHAT_ID }} \
+           -d text="✅ API tests completed. Check Allure report or test logs."
