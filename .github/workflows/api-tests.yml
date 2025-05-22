@@ -1,12 +1,12 @@
 name: API Tests (Manual + Scheduled)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # кнопка запуска
   schedule:
-    - cron: '0 * * * *' # Запуск каждый час
+    - cron: '0 * * * *' # каждый час (UTC)
 
 jobs:
-  run-api-tests:
+  test-api:
     runs-on: ubuntu-latest
 
     env:
@@ -17,7 +17,7 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up Java
@@ -29,17 +29,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Install Puppeteer
-        run: npm install puppeteer
-
-      - name: Generate api.properties from secrets
+      - name: Generate api.properties
         run: |
-          mkdir -p src/test/resources
-          echo "api.baseUri=${API_BASE_URI}" > src/test/resources/api.properties
-          echo "api.basePath=${API_BASE_PATH}" >> src/test/resources/api.properties
-          echo "api.key=${API_KEY}" >> src/test/resources/api.properties
+          echo "api.baseUri=$API_BASE_URI" > src/test/resources/api.properties
+          echo "api.basePath=$API_BASE_PATH" >> src/test/resources/api.properties
+          echo "api.key=$API_KEY" >> src/test/resources/api.properties
 
       - name: Run tests
         run: ./gradlew clean test
@@ -47,26 +43,25 @@ jobs:
       - name: Generate Allure report
         run: ./gradlew allureReport
 
-      - name: Take screenshot of Allure report
+      - name: Install Puppeteer deps and take screenshot
         run: |
-          node <<'EOF'
-          const puppeteer = require('puppeteer');
-          const path = require('path');
+          npm ci
+          node screenshot.js
 
-          (async () => {
-            const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-            const page = await browser.newPage();
-            const filePath = 'file://' + path.resolve('build/reports/allure-report/index.html');
-            await page.goto(filePath, { waitUntil: 'networkidle2' });
-            await page.screenshot({ path: 'allure-summary.png', fullPage: true });
-            await browser.close();
-          })();
-          EOF
-
-      - name: Send screenshot to Telegram
+      - name: Send result to Telegram
+        if: always()
         run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            STATUS="✅ API tests passed"
+          else
+            STATUS="❌ API tests failed"
+          fi
+
+          MESSAGE="${STATUS}%0ARepo: kbsQA7/CoinsHistoryAPI%0AWorkflow: API Tests%0ACommit: ${{ github.sha }}"
+
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" \
             -F chat_id="${TELEGRAM_CHAT_ID}" \
-            -F photo="@allure-summary.png" \
-            -F caption="📊 Allure Test Summary"
+            -F photo=@"allure-summary.png" \
+            -F caption="${MESSAGE}"
+
 
