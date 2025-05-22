@@ -10,7 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-const reportPath = path.resolve(__dirname, 'build', 'reports', 'allure-report', 'index.html');
+const reportPath = path.resolve(__dirname, 'build', 'reports', 'allure-report', 'allureReport', 'index.html');
+
 
 
 if (!existsSync(reportPath)) {
