@@ -46,14 +46,5 @@ tasks.withType(Test) {
             events "started", "skipped", "failed", "standard_error", "standard_out"
             exceptionFormat "short"
         }
-        task generateAllureScreenshot(type: Exec) {
-            dependsOn 'allureReport'
-
-            workingDir projectDir
-            commandLine 'node', 'screenshot.js'
-        }
-        tasks.register('allureReport') {
-            dependsOn test
-        }
     }
 }
