@@ -36,11 +36,11 @@ const page = await browser.newPage();
 
 await page.goto(htmlFileUrl, { waitUntil: 'networkidle0' });
 
-await page.waitForFunction(() => {
-  return ![...document.querySelectorAll('div')].some(div => div.textContent.includes('Loading...'));
-}, { timeout: 5000 });
+// ⏳ Ждём 3 секунды, чтобы Allure успел отрисовать метрики
+await page.waitForTimeout(4000);
 
 await page.screenshot({ path: screenshotPath });
+
 
 await browser.close();
 
