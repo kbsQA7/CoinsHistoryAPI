@@ -5,7 +5,8 @@ import { existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const reportPath = path.resolve(__dirname, 'build', 'reports', 'allure-report', 'index.html');
+const reportPath = path.resolve(__dirname, 'build', 'reports', 'allure-report', 'allureReport', 'index.html');
+
 
 if (!existsSync(reportPath)) {
   console.error('❌ Allure report index.html not found. Make sure it is generated before running this script.');
