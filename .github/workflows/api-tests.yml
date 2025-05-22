@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       API_BASE_URI: ${{ secrets.API_BASE_URI }}
       API_BASE_PATH: ${{ secrets.API_BASE_PATH }}
@@ -54,7 +54,7 @@ jobs:
 
           MESSAGE="${STATUS}%0ARepo: ${{ github.repository }}%0AWorkflow: API Tests (Manual + Scheduled)%0ACommit: ${{ github.sha }}"
 
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
             -d text="$MESSAGE"
 
