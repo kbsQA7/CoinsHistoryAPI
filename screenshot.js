@@ -28,8 +28,10 @@ const screenshotPath = path.resolve(__dirname, 'allure-summary.png');
 
 const browser = await puppeteer.launch({
   headless: 'new',
-  defaultViewport: { width: 1400, height: 1000 }
+  defaultViewport: { width: 1400, height: 1000 },
+  args: ['--no-sandbox', '--disable-setuid-sandbox'] 
 });
+
 const page = await browser.newPage();
 
 await page.goto(htmlFileUrl, { waitUntil: 'networkidle0' });
