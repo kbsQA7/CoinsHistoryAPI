@@ -52,5 +52,8 @@ tasks.withType(Test) {
             workingDir projectDir
             commandLine 'node', 'screenshot.js'
         }
+        tasks.register('allureReport') {
+            dependsOn test
+        }
     }
 }
