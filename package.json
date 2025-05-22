@@ -1,0 +1,16 @@
+{
+  "name": "coinshistoryapi",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "screenshot": "node screenshot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kbsQA7/CoinsHistoryAPI.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^24.9.0"
+  }
+}
