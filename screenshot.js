@@ -26,7 +26,7 @@ const page = await browser.newPage();
 await page.goto(htmlFileUrl, { waitUntil: 'networkidle0' });
 
 // ⏳ Ждём вручную 4 секунды
-await new Promise(resolve => setTimeout(resolve, 4000));
+await new Promise(resolve => setTimeout(resolve, 20000));
 
 await page.screenshot({ path: screenshotPath });
 await browser.close();
