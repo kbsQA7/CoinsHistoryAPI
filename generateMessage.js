@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const summaryPath = 'build/reports/allure-report/allureReport/widgets/summary.json';
-const suitesPath = 'build/reports/allure-report/allureReport/widgets/suites.json';
+const testCasesDir = 'build/allure-report/data/test-cases/';
+
 
 // Проверка, что summary вообще есть
 if (!fs.existsSync(summaryPath)) {
