@@ -1,46 +1,45 @@
 import fs from 'fs';
 import path from 'path';
 
-// Пути к Allure JSON
-const basePath = 'build/reports/allure-report/allureReport/widgets/';
-const summary = JSON.parse(fs.readFileSync(path.join(basePath, 'summary.json'), 'utf-8'));
-const results = JSON.parse(fs.readFileSync(path.join(basePath, 'result.json'), 'utf-8'));
+const summary = JSON.parse(fs.readFileSync('build/reports/allure-report/allureReport/widgets/summary.json', 'utf-8'));
+const testCasesDir = 'build/reports/allure-report/allureReport/data/test-cases/';
 
 const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
 
-// Получаем GitHub context из ENV
 const branch = process.env.GITHUB_REF_NAME || 'unknown';
 const time = process.env.TIME || 'неизвестно';
+const repo = process.env.REPO || 'unknown/repo';
+const runId = process.env.RUN_ID || '0';
 
-// Обрабатываем упавшие тесты
 let failedTests = '';
-if (failed > 0) {
-  results.forEach(test => {
-    if (test.status === 'failed') {
-      failedTests += `\n*${test.name}*\n📝 Steps:\n`;
-      if (test.steps?.length) {
-        test.steps.forEach(step => {
-          const icon = step.status === 'passed' ? '✅' :
-                       step.status === 'failed' ? '❌' :
-                       step.status === 'skipped' ? '⏭' : '🔹';
-          failedTests += `- ${icon} ${step.name}\n`;
-        });
-      } else {
-        failedTests += `- ⚠️ Шаги не найдены\n`;
-      }
+
+fs.readdirSync(testCasesDir).forEach(file => {
+  const test = JSON.parse(fs.readFileSync(path.join(testCasesDir, file), 'utf-8'));
+  if (test.status === 'failed') {
+    failedTests += `\n*${test.name}*\n📝 Steps:\n`;
+    if (test.steps?.length) {
+      test.steps.forEach(step => {
+        const icon =
+          step.status === 'passed' ? '✅' :
+          step.status === 'failed' ? '❌' :
+          step.status === 'skipped' ? '⏭' : '🔹';
+        failedTests += `- ${icon} ${step.name}\n`;
+      });
+    } else {
+      failedTests += `- ⚠️ Шаги не найдены\n`;
     }
-  });
-}
+  }
+});
 
-// Статус
-const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
+const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
+const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const runResult = failed > 0 ? 'completed with errors' : 'passed';
+const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
 
-// Финальное сообщение
 const message = `
 ✅ Scheduled run tests ${runResult}
 🧪 *Проект:* CoinsHistoryAPI
-🔗 [Репозиторий](https://github.com/kbsQA7/CoinsHistoryAPI)
+🔗 [Репозиторий](https://github.com/${repo})
 🕒 *Время запуска:* ${time}
 🔁 *Бранч:* ${branch}
 ⚙️ *CI:* GitHub Actions
@@ -51,6 +50,9 @@ const message = `
 ⏭ Пропущено: ${skipped}
 
 ${failedTests ? `🧨 *Упавшие тесты:*${failedTests}` : ''}
+
+📎 [Allure-отчёт](${allureLink})
+📁 [Логи CI](${logsLink})
 
 🛠️ *Ответственный:* @kbsQA7
 📢 *Статус:* ${statusText}
