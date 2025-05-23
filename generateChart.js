@@ -10,6 +10,7 @@ const summaryPath = 'build/allure-report/widgets/summary.json';
 const testCasesDir = 'build/allure-report/data/test-cases/';
 
 
+
 if (!fs.existsSync(summaryPath)) {
   console.error('❌ summary.json не найден.');
   process.exit(1);
