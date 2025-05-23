@@ -21,7 +21,7 @@ public class PriceHistoryTest extends ApiTestBase {
     @Owner("kbsQA7")
     void randomCoinRandomDate() {
         String coin = RandomUtils.randomCoin();
-        String date = RandomUtils.randomDate(2023, 2025);
+        String date = RandomUtils.randomDate(2022, 2024);
 
         PriceHistoryResponse model = step(String.format("Запрос цены coin=%s на дату=%s", coin, date), () ->
                 given(baseSpec())
@@ -44,7 +44,7 @@ public class PriceHistoryTest extends ApiTestBase {
     @Owner("kbsQA7")
     void nonExistingCoin() {
         String fakeCoin = TestData.INVALID_COIN;
-        String date = RandomUtils.randomDate(2023, 2025);
+        String date = RandomUtils.randomDate(2022, 2024);
 
         Response resp = step("Запрос цены для несуществующей монеты: " + fakeCoin, () ->
                 given(baseSpec())
