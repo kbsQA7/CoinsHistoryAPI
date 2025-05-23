@@ -18,15 +18,17 @@ let failedTests = '';
 if (fs.existsSync(suitesPath)) {
   const suites = JSON.parse(fs.readFileSync(suitesPath, 'utf-8'));
 
-  function collectFailedTests(items) {
-    for (const item of items) {
-      if (item.children && item.children.length > 0) {
-        collectFailedTests(item.children);
-      } else if (item.status === 'failed') {
-        failedTests += `\n❌ ${item.name}`;
-      }
+ function collectFailedTests(items) {
+  for (const item of items) {
+    if (item.children && item.children.length > 0) {
+      collectFailedTests(item.children);
+    } else if (item.status === 'failed') {
+      const testName = item.name || item.testCaseName || item.fullName || '[Unnamed Test]';
+      failedTests += `\n❌ ${testName}`;
     }
   }
+}
+
 
   // ✅ Гарантированно безопасный вход
   const rootItems = Array.isArray(suites.children) ? suites.children : (Array.isArray(suites) ? suites : []);
