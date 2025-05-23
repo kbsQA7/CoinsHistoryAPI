@@ -25,7 +25,7 @@ if (rawTime) {
     const [hours, minutes] = timePart.split(':').map(Number);
 
     const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
-    utcDate.setUTCHours(utcDate.getUTCHours()) + 3; 
+    utcDate.setUTCHours(utcDate.getUTCHours() + 3); 
 
     const pad = (n) => n.toString().padStart(2, '0');
     formattedTime = `${pad(utcDate.getDate())}.${pad(utcDate.getMonth() + 1)}.${utcDate.getFullYear()} ${pad(utcDate.getHours())}:${pad(utcDate.getMinutes())}`;
