@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const summaryPath = path.join(__dirname, 'build', 'reports', 'allure-report', 'allureReport', 'widgets', 'summary.json');
 
 if (!fs.existsSync(summaryPath)) {
-  console.error('❌ summary.json не найден. Убедись, что Allure отчёт был сгенерирован.');
+  console.error('❌ summary.json не найден.');
   process.exit(1);
 }
 
@@ -81,7 +81,7 @@ const html = `
             },
             title: {
               display: true,
-              text: 'Allure Test Results Summary',
+              text: 'CoinsHistoryAPI Tests Results Chart',
               font: {
                 size: 20
               }
