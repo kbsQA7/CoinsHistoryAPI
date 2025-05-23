@@ -1,39 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 
+const summaryPath = 'build/allure-report/widgets/summary.json';
 const testCasesDir = 'build/allure-report/data/test-cases/';
-
-
-// Проверка, что summary вообще есть
-if (!fs.existsSync(summaryPath)) {
-  console.error('❌ summary.json не найден.');
-  process.exit(1);
-}
 
 const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
 const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
-
-let failedTests = '';
-
-if (fs.existsSync(suitesPath)) {
-  const suites = JSON.parse(fs.readFileSync(suitesPath, 'utf-8'));
-
- function collectFailedTests(items) {
-  for (const item of items) {
-    if (item.children && item.children.length > 0) {
-      collectFailedTests(item.children);
-    } else if (item.status === 'failed') {
-      const testName = item.name || item.testCaseName || item.fullName || '[Unnamed Test]';
-      failedTests += `\n❌ ${testName}`;
-    }
-  }
-}
-
-
-  // ✅ Гарантированно безопасный вход
-  const rootItems = Array.isArray(suites.children) ? suites.children : (Array.isArray(suites) ? suites : []);
-  collectFailedTests(rootItems);
-}
 
 const branch = process.env.GITHUB_REF_NAME || 'unknown';
 const time = process.env.TIME || 'неизвестно';
@@ -44,6 +16,38 @@ const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const runResult = failed > 0 ? 'completed with errors' : 'passed';
 const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
+
+function renderSteps(steps, indent = 0) {
+  if (!steps) return '';
+  const pad = '  '.repeat(indent);
+  return steps.map(step => {
+    const icon =
+      step.status === 'passed' ? '✅' :
+      step.status === 'failed' ? '❌' :
+      step.status === 'skipped' ? '⏭' : '🔹';
+    let line = `${pad}- ${icon} ${step.name}`;
+    if (step.steps && step.steps.length > 0) {
+      line += '\n' + renderSteps(step.steps, indent + 1);
+    }
+    return line;
+  }).join('\n');
+}
+
+let failedTests = '';
+
+if (fs.existsSync(testCasesDir)) {
+  fs.readdirSync(testCasesDir).forEach(file => {
+    const test = JSON.parse(fs.readFileSync(path.join(testCasesDir, file), 'utf-8'));
+    if (test.status === 'failed') {
+      failedTests += `\n*${test.name || '[Без имени]'}*\n📝 Steps:\n`;
+      if (test.steps && test.steps.length > 0) {
+        failedTests += renderSteps(test.steps) + '\n';
+      } else {
+        failedTests += `- ⚠️ Шаги не найдены\n`;
+      }
+    }
+  });
+}
 
 const message = `
 ✅ Scheduled run tests ${runResult}
@@ -57,7 +61,8 @@ const message = `
 ✅ Пройдено: ${passed}
 ❌ Провалено: ${failed}
 ⏭ Пропущено: ${skipped}
-${failed > 0 ? `\n🧨 *Упавшие тесты:*${failedTests}` : ''}
+
+${failedTests ? `🧨 *Упавшие тесты:*${failedTests}` : ''}
 
 📎 [Allure-отчёт](${allureLink})
 📁 [Логи CI](${logsLink})
@@ -67,7 +72,6 @@ ${failed > 0 ? `\n🧨 *Упавшие тесты:*${failedTests}` : ''}
 `;
 
 console.log(message.trim());
-
 
 
 
