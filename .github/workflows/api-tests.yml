@@ -45,27 +45,14 @@ jobs:
         run: ./gradlew clean test
         continue-on-error: true
 
-      - name: Generate Allure report (CLI + default-json)
-        run: |
-         npx allure generate build/allure-results --clean -o build/allure-report
-
-
-
-      - name: Debug — проверить структуру build/
-        run: |
-          echo "🔍 Список файлов в build:"
-          ls -R build
-
-      - name: Debug — ищем summary.json
-        run: |
-          echo "🔍 Поиск summary.json..."
-          find build -type f -name summary.json
+      - name: Generate Allure report
+        run: ./gradlew allureReport
 
       - name: Upload Allure report as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: allure-report
-          path: build/allure-report
+          path: build/reports/allure-report
 
       - name: Generate donut chart from Allure summary
         run: node generateChart.js
@@ -77,7 +64,8 @@ jobs:
           TIME: ${{ steps.get-time.outputs.time }}
           RUN_ID: ${{ github.run_id }}
           REPO: ${{ github.repository }}
-        run: node generateMessage.js > message.txt
+        run: |
+          node generateMessage.js > message.txt
 
       - name: Send chart and message to Telegram
         run: |
