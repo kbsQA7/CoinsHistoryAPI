@@ -38,6 +38,7 @@ const html = `
   <body>
     <canvas id="chart" width="800" height="800"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script>
       const ctx = document.getElementById('chart').getContext('2d');
       new Chart(ctx, {
@@ -49,7 +50,6 @@ const html = `
             '⚠️ Skipped: ${skipped}'
           ],
           datasets: [{
-            label: 'Test Results',
             data: [${passed}, ${failed}, ${skipped}],
             backgroundColor: ['#4caf50', '#f44336', '#ff9800'],
             borderColor: ['#388e3c', '#d32f2f', '#f57c00'],
@@ -58,6 +58,16 @@ const html = `
         },
         options: {
           plugins: {
+            datalabels: {
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 18
+              },
+              formatter: (value, ctx) => {
+                return ctx.chart.data.labels[ctx.dataIndex];
+              }
+            },
             legend: {
               display: true,
               position: 'bottom'
@@ -71,13 +81,12 @@ const html = `
             },
             tooltip: {
               callbacks: {
-                label: function(context) {
-                  return context.label; // Показывает: "❌ Failed: 2"
-                }
+                label: (context) => context.label
               }
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
     </script>
   </body>
@@ -95,4 +104,5 @@ await page.screenshot({ path: 'allure-summary-chart.png' });
 await browser.close();
 
 console.log('✅ Диаграмма успешно сгенерирована: allure-summary-chart.png');
+
 
