@@ -15,7 +15,6 @@ const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
 
 let failedTests = '';
 
-// Проверяем suites.json и ищем упавшие тесты
 if (fs.existsSync(suitesPath)) {
   const suites = JSON.parse(fs.readFileSync(suitesPath, 'utf-8'));
 
@@ -29,7 +28,9 @@ if (fs.existsSync(suitesPath)) {
     }
   }
 
-  collectFailedTests(suites.children || suites);
+  // ✅ Гарантированно безопасный вход
+  const rootItems = Array.isArray(suites.children) ? suites.children : (Array.isArray(suites) ? suites : []);
+  collectFailedTests(rootItems);
 }
 
 const branch = process.env.GITHUB_REF_NAME || 'unknown';
@@ -64,6 +65,7 @@ ${failed > 0 ? `\n🧨 *Упавшие тесты:*${failedTests}` : ''}
 `;
 
 console.log(message.trim());
+
 
 
 
