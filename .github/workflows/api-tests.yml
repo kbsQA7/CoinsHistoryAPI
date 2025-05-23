@@ -45,9 +45,10 @@ jobs:
         run: ./gradlew clean test
         continue-on-error: true
 
-      - name: Generate Allure report (CLI + шаги)
+      - name: Generate Allure report (CLI + default-json)
         run: |
-         npx allure generate build/allure-results --clean -o build/allure-report --plugins default-json
+         npx allure generate build/allure-results --clean -o build/allure-report
+
 
 
       - name: Debug — проверить структуру build/
