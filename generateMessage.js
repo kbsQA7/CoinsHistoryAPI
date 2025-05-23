@@ -56,9 +56,14 @@ let failedTests = '';
 if (fs.existsSync(testCasesDir)) {
   fs.readdirSync(testCasesDir).forEach(file => {
     const test = JSON.parse(fs.readFileSync(path.join(testCasesDir, file), 'utf-8'));
-    if (test.status === 'failed') {
-      failedTests += `\n*${test.name || '[Без имени]'}*`;
-    }
+   if (test.status === 'failed') {
+  failedTests += `\n*${test.name || '[Без имени]'}*`;
+  const errorMsg = test.statusDetails?.message;
+  if (errorMsg) {
+    failedTests += `\n💥 ${errorMsg.split('\n')[0]}`; // только первая строка
+  }
+  failedTests += '\n';
+}
   });
 }
 
