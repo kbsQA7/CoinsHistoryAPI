@@ -10,6 +10,9 @@ import utils.RandomUtils;
 import utils.IntervalUtils;
 import utils.TestData;
 import validators.ChartValidator;
+import org.junit.jupiter.api.extension.ExtendWith;
+import io.qameta.allure.junit5.AllureJunit5;
+
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
