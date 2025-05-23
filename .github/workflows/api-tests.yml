@@ -53,8 +53,12 @@ jobs:
 
       - name: Create Telegram message
         id: generate-message
-        run: |
-          node generateMessage.js > message.txt
+        env:
+         GITHUB_REF_NAME: ${{ github.ref_name }}
+         TIME: ${{ steps.get-time.outputs.time }}
+         run: |
+           node generateMessage.js > message.txt
+
 
       - name: Send chart and message to Telegram
         run: |
