@@ -48,12 +48,8 @@ jobs:
       - name: Debug - list Allure report files
         run: ls -R build/reports/allure-report
 
-      - name: Take Allure screenshot
-        run: node screenshot.js
-
-      - name: Debug Check screenshot exists
-        run: ls -la allure-summary.png
-
+      - name: Generate donut chart from Allure summary
+        run: node generateChart.js
 
       - name: Send chart to Telegram
         run: |
