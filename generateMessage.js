@@ -15,24 +15,21 @@ const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const runResult = failed > 0 ? 'completed with errors' : 'passed';
 const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
-const rawTime = process.env.TIME || '';
+const rawTime = process.env.TIME || ''; // должен быть формат "23.05.2025 23:34:00"
 let formattedTime = 'неизвестно';
 
-if (rawTime) {
-  try {
-    const [datePart, timePart] = rawTime.split(' ');
-    const [day, month, year] = datePart.split('.').map(Number);
-    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+if (/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}:\d{2}$/.test(rawTime)) {
+  const [datePart, timePart] = rawTime.split(' ');
+  const [day, month, year] = datePart.split('.').map(Number);
+  const [hours, minutes, seconds] = timePart.split(':').map(Number);
 
-    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
-    utcDate.setUTCHours(utcDate.getUTCHours() + 3); // перевод в МСК
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
+  utcDate.setUTCHours(utcDate.getUTCHours() + 3); // +3 к UTC для МСК
 
-    const pad = (n) => n.toString().padStart(2, '0');
-    formattedTime = `${pad(utcDate.getDate())}.${pad(utcDate.getMonth() + 1)}.${utcDate.getFullYear()}, ${pad(utcDate.getHours())}:${pad(utcDate.getMinutes())}:${pad(utcDate.getSeconds())}`;
-  } catch {
-    formattedTime = rawTime;
-  }
+  const pad = (n) => n.toString().padStart(2, '0');
+  formattedTime = `${pad(utcDate.getDate())}.${pad(utcDate.getMonth() + 1)}.${utcDate.getFullYear()}, ${pad(utcDate.getHours())}:${pad(utcDate.getMinutes())}:${pad(utcDate.getSeconds())}`;
 }
+
 
 function renderSteps(steps, indent = 0) {
   if (!steps) return '';
