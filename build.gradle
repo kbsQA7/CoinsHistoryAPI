@@ -1,14 +1,15 @@
 plugins {
     id 'java'
-    id('io.qameta.allure') version '2.11.2'
+    id 'io.qameta.allure' version '2.11.2'
     id "io.freefair.lombok" version "6.0.0-m2"
 }
 
 repositories {
     mavenCentral()
 }
-def restAssuredVersion = "5.3.1",
-    allureVersion = "2.21.0"
+
+def restAssuredVersion = "5.3.1"
+def allureVersion = "2.24.0" // Обновил до последнего
 
 allure {
     report {
@@ -16,6 +17,7 @@ allure {
     }
     adapter {
         aspectjWeaver.set(true)
+        autoconfigureListeners.set(true) // ВАЖНО: включаем автоподключение
         frameworks {
             junit5 {
                 adapterVersion.set(allureVersion)
@@ -26,15 +28,14 @@ allure {
 
 dependencies {
     testImplementation(
-            "io.rest-assured:rest-assured:$restAssuredVersion",
-            "io.rest-assured:json-schema-validator:$restAssuredVersion",
-            'org.junit.jupiter:junit-jupiter:5.10.1',
-            'org.slf4j:slf4j-simple:2.0.7',
-            'org.aeonbits.owner:owner:1.0.12',
-            'org.assertj:assertj-core:3.25.1',
-            "io.qameta.allure:allure-rest-assured:$allureVersion",
-            "io.qameta.allure:allure-junit5:2.24.0"
-
+        "io.rest-assured:rest-assured:$restAssuredVersion",
+        "io.rest-assured:json-schema-validator:$restAssuredVersion",
+        "org.junit.jupiter:junit-jupiter:5.10.1",
+        "org.slf4j:slf4j-simple:2.0.7",
+        "org.aeonbits.owner:owner:1.0.12",
+        "org.assertj:assertj-core:3.25.1",
+        "io.qameta.allure:allure-rest-assured:$allureVersion",
+        "io.qameta.allure:allure-junit5:$allureVersion"
     )
 }
 
