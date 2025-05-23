@@ -12,7 +12,7 @@ import validators.PriceHistoryValidator;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 
-
+@ExtendWith({AllureJunit5.class})
 public class PriceHistoryTest extends ApiTestBase {
 
     @Test
