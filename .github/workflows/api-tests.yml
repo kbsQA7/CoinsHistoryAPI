@@ -45,8 +45,9 @@ jobs:
         run: ./gradlew clean test
         continue-on-error: true
 
-      - name: Generate Allure report
-        run: ./gradlew allureReport
+      - name: Generate Allure report (via CLI)
+        run: npx allure generate build/allure-results --clean -o build/allure-report
+
 
       - name: Debug — check raw results
         run: ls -l build/allure-results || echo "❌ No raw results"
