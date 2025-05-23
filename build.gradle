@@ -32,7 +32,8 @@ dependencies {
             'org.slf4j:slf4j-simple:2.0.7',
             'org.aeonbits.owner:owner:1.0.12',
             'org.assertj:assertj-core:3.25.1',
-            "io.qameta.allure:allure-rest-assured:$allureVersion"
+            "io.qameta.allure:allure-rest-assured:$allureVersion",
+            "io.qameta.allure:allure-junit5:2.24.0"
 
     )
 }
