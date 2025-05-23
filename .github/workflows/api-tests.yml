@@ -3,7 +3,7 @@ name: API Tests (Manual + Scheduled)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *' 
+    - cron: '0 * * * *'
 
 jobs:
   run-api-tests:
@@ -24,11 +24,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Puppeteer
+      - name: Install dependencies
         run: npm install
 
       - name: Install Allure CLI
         run: npm install -g allure-commandline --save-dev
+
+      - name: Save run time
+        id: get-time
+        run: echo "time=$(date '+%d.%m.%Y %H:%M')" >> "$GITHUB_OUTPUT"
 
       - name: Generate api.properties from secrets
         run: |
@@ -41,20 +45,21 @@ jobs:
         run: ./gradlew clean test
         continue-on-error: true
 
-
       - name: Generate Allure report
         run: ./gradlew allureReport
-
-      - name: Debug - list Allure report files
-        run: ls -R build/reports/allure-report
 
       - name: Generate donut chart from Allure summary
         run: node generateChart.js
 
-      - name: Send chart to Telegram
+      - name: Create Telegram message
+        id: generate-message
         run: |
+          node generateMessage.js > message.txt
 
-           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendPhoto" \
-             -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-             -F photo=@"allure-summary-chart.png" \
-             -F caption="📊 Allure Test Results"
+      - name: Send chart and message to Telegram
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendPhoto" \
+            -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -F photo=@"allure-summary-chart.png" \
+            -F caption="$(cat message.txt)" \
+            -F parse_mode="Markdown"
