@@ -39,15 +39,11 @@ if (fs.existsSync(testCasesDir)) {
   fs.readdirSync(testCasesDir).forEach(file => {
     const test = JSON.parse(fs.readFileSync(path.join(testCasesDir, file), 'utf-8'));
     if (test.status === 'failed') {
-      failedTests += `\n*${test.name || '[Без имени]'}*\n📝 Steps:\n`;
-      if (test.steps && test.steps.length > 0) {
-        failedTests += renderSteps(test.steps) + '\n';
-      } else {
-        failedTests += `- ⚠️ Шаги не найдены\n`;
-      }
+      failedTests += `\n*${test.name || '[Без имени]'}*`;
     }
   });
 }
+
 
 const message = `
 ✅ Scheduled run tests ${runResult}
