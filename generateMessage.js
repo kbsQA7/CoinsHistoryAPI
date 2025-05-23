@@ -15,20 +15,29 @@ const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const runResult = failed > 0 ? 'completed with errors' : 'passed';
 const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
-const rawTime = process.env.TIME || ''; // должен быть формат "23.05.2025 23:34:00"
+const rawTime = process.env.TIME || '';
 let formattedTime = 'неизвестно';
 
-if (/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}:\d{2}$/.test(rawTime)) {
-  const [datePart, timePart] = rawTime.split(' ');
-  const [day, month, year] = datePart.split('.').map(Number);
-  const [hours, minutes, seconds] = timePart.split(':').map(Number);
+if (rawTime) {
+  try {
+    // Парсинг строки в формате "DD.MM.YYYY HH:mm"
+    const [datePart, timePart] = rawTime.split(' ');
+    const [day, month, year] = datePart.split('.').map(Number);
+    const [hours, minutes] = timePart.split(':').map(Number);
 
-  const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
-  utcDate.setUTCHours(utcDate.getUTCHours() + 3); // +3 к UTC для МСК
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+    // Сдвигаем на +3 часа (МСК)
+    utcDate.setUTCHours(utcDate.getUTCHours());
 
-  const pad = (n) => n.toString().padStart(2, '0');
-  formattedTime = `${pad(utcDate.getDate())}.${pad(utcDate.getMonth() + 1)}.${utcDate.getFullYear()}, ${pad(utcDate.getHours())}:${pad(utcDate.getMinutes())}:${pad(utcDate.getSeconds())}`;
+    formattedTime = utcDate.toLocaleString('ru-RU', {
+      timeZone: 'Europe/Moscow',
+      hour12: false
+    });
+  } catch {
+    formattedTime = rawTime;
+  }
 }
+
 
 
 function renderSteps(steps, indent = 0) {
