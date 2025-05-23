@@ -9,7 +9,7 @@ repositories {
 }
 
 def restAssuredVersion = "5.3.1"
-def allureVersion = "2.24.0" // Обновил до последнего
+def allureVersion = "2.24.0" 
 
 allure {
     report {
@@ -19,12 +19,16 @@ allure {
     }
     adapter {
         aspectjWeaver.set(true)
-        autoconfigureListeners.set(true) // ВАЖНО: включаем автоподключение
+        autoconfigureListeners.set(true) 
         frameworks {
             junit5 {
                 adapterVersion.set(allureVersion)
             }
         }
+    }
+    configuration {
+        
+        plugins = ["packages", "behaviors", "default-json"]
     }
 }
 
@@ -52,3 +56,4 @@ tasks.withType(Test) {
         }
     }
 }
+
