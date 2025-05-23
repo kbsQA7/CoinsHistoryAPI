@@ -48,23 +48,22 @@ jobs:
       - name: Generate Allure report
         run: ./gradlew allureReport
 
-      - name: Debug — есть ли результаты тестов
-        run: |
-          echo "🔍 Смотрим build/allure-results:"
-          ls -l build/allure-results
+      - name: Debug — check raw results
+        run: ls -l build/allure-results || echo "❌ No raw results"
 
+      - name: Debug — check generated Allure report
+        run: ls -l build/reports/allure-report/allureReport || echo "❌ No HTML report"
 
-      - name: Archive Allure report (correct structure)
+      - name: Archive Allure report contents (clean zip)
         run: |
-         cd build/reports/allure-report/allureReport
-         zip -r ../../../../allure-report.zip ./*
+          cd build/reports/allure-report/allureReport
+          zip -r ../../../../allure-report.zip ./*
 
       - name: Upload zipped Allure report
         uses: actions/upload-artifact@v4
         with:
-         name: allure-report
-         path: build/allure-report.zip
-
+          name: allure-report
+          path: build/allure-report.zip
 
       - name: Generate donut chart from Allure summary
         run: node generateChart.js
@@ -86,5 +85,6 @@ jobs:
             -F photo=@"allure-summary-chart.png" \
             -F caption="$(cat message.txt)" \
             -F parse_mode="Markdown"
+
 
 
