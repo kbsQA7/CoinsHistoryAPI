@@ -48,7 +48,11 @@ const html = `
             '⚠️ Skipped: ${skipped}'
           ],
           datasets: [{
-            data: [${passed}, ${failed}, ${skipped}],
+            data: [
+             ${passed > 0 ? passed : 0.001}, 
+             ${failed > 0 ? failed : 0.001}, 
+             ${skipped > 0 ? skipped : 0.001}
+          ],
             backgroundColor: ['#4caf50', '#f44336', '#ff9800'],
             borderColor: ['#388e3c', '#d32f2f', '#f57c00'],
             borderWidth: 2,
