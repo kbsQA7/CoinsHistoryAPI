@@ -16,6 +16,31 @@ if (!fs.existsSync(summaryPath)) {
 const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
 const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
 
+
+const labels = [];
+const values = [];
+const colors = [];
+const borders = [];
+
+if (passed > 0) {
+  labels.push('✅ Passed: ' + passed);
+  values.push(passed);
+  colors.push('#4caf50');
+  borders.push('#388e3c');
+}
+if (failed > 0) {
+  labels.push('❌ Failed: ' + failed);
+  values.push(failed);
+  colors.push('#f44336');
+  borders.push('#d32f2f');
+}
+if (skipped > 0) {
+  labels.push('⚠️ Skipped: ' + skipped);
+  values.push(skipped);
+  colors.push('#ff9800');
+  borders.push('#f57c00');
+}
+
 const html = `
 <!DOCTYPE html>
 <html>
@@ -38,24 +63,21 @@ const html = `
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script>
+      const labels = ${JSON.stringify(labels)};
+      const values = ${JSON.stringify(values)};
+      const colors = ${JSON.stringify(colors)};
+      const borders = ${JSON.stringify(borders)};
+
       const ctx = document.getElementById('chart').getContext('2d');
       new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: [
-            '✅ Passed: ${passed}', 
-            '❌ Failed: ${failed}', 
-            '⚠️ Skipped: ${skipped}'
-          ],
+          labels: labels,
           datasets: [{
-            data: [
-             ${passed > 0 ? passed : 0.001}, 
-             ${failed > 0 ? failed : 0.001}, 
-             ${skipped > 0 ? skipped : 0.001}
-          ],
-            backgroundColor: ['#4caf50', '#f44336', '#ff9800'],
-            borderColor: ['#388e3c', '#d32f2f', '#f57c00'],
-            borderWidth: 2,
+            data: values,
+            backgroundColor: colors,
+            borderColor: borders,
+            borderWidth: 2
           }]
         },
         options: {
@@ -70,14 +92,13 @@ const html = `
               color: '#fff',
               font: {
                 weight: 'bold',
-                size: 12
+                size: 14
               },
               formatter: (value, ctx) => {
-                return value > 0 ? ctx.chart.data.labels[ctx.dataIndex] : '';
+                return ctx.chart.data.labels[ctx.dataIndex];
               },
               anchor: 'center',
-              align: 'center',
-              offset: 0
+              align: 'center'
             },
             legend: {
               display: true,
@@ -115,6 +136,7 @@ await page.screenshot({ path: 'allure-summary-chart.png' });
 await browser.close();
 
 console.log('✅ Диаграмма успешно сгенерирована: allure-summary-chart.png');
+
 
 
 
