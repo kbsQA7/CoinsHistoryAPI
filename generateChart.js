@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const summaryPath = path.join(__dirname, 'build', 'allure-report', 'widgets', 'summary.json');
+const summaryPath = 'build/allure-report/widgets/summary.json';
+const testCasesDir = 'build/allure-report/data/test-cases/';
 
 
 if (!fs.existsSync(summaryPath)) {
