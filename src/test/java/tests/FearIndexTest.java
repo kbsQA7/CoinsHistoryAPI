@@ -13,7 +13,7 @@ import validators.FearIndexValidator;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 
-
+@ExtendWith({AllureJunit5.class})
 public class FearIndexTest extends ApiTestBase {
 
     @Test
