@@ -21,7 +21,7 @@ public class PriceHistoryTest extends ApiTestBase {
     @Owner("kbsQA7")
     void randomCoinRandomDate() {
         String coin = RandomUtils.randomCoin();
-        String date = RandomUtils.randomDate(2017);
+        String date = RandomUtils.randomDate(2017, 2018);
 
         PriceHistoryResponse model = step(String.format("Запрос цены coin=%s на дату=%s", coin, date), () ->
                 given(baseSpec())
