@@ -13,7 +13,7 @@ import validators.ChartValidator;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 
-
+@ExtendWith({AllureJunit5.class})
 public class ChartByTimeframeTest extends ApiTestBase {
 
 
