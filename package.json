@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "screenshot": "node screenshot.js"
-  },
+  "chart": "node generateChart.js"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kbsQA7/CoinsHistoryAPI.git"
