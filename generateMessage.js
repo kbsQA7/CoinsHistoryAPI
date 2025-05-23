@@ -20,19 +20,15 @@ let formattedTime = 'неизвестно';
 
 if (rawTime) {
   try {
-    // Парсинг строки в формате "DD.MM.YYYY HH:mm"
     const [datePart, timePart] = rawTime.split(' ');
     const [day, month, year] = datePart.split('.').map(Number);
-    const [hours, minutes] = timePart.split(':').map(Number);
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
 
-    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
-    // Сдвигаем на +3 часа (МСК)
-    utcDate.setUTCHours(utcDate.getUTCHours() + 3);
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
+    utcDate.setUTCHours(utcDate.getUTCHours() + 3); // перевод в МСК
 
-    formattedTime = utcDate.toLocaleString('ru-RU', {
-      timeZone: 'Europe/Moscow',
-      hour12: false
-    });
+    const pad = (n) => n.toString().padStart(2, '0');
+    formattedTime = `${pad(utcDate.getDate())}.${pad(utcDate.getMonth() + 1)}.${utcDate.getFullYear()}, ${pad(utcDate.getHours())}:${pad(utcDate.getMinutes())}:${pad(utcDate.getSeconds())}`;
   } catch {
     formattedTime = rawTime;
   }
