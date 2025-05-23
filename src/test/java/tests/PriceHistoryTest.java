@@ -8,14 +8,12 @@ import org.junit.jupiter.api.Test;
 import utils.RandomUtils;
 import utils.TestData;
 import validators.PriceHistoryValidator;
-import org.junit.jupiter.api.extension.ExtendWith;
-import io.qameta.allure.junit5.AllureJunit5;
 
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 
-@ExtendWith({AllureJunit5.class})
+
 public class PriceHistoryTest extends ApiTestBase {
 
     @Test
