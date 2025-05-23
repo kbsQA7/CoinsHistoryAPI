@@ -54,11 +54,17 @@ jobs:
           ls -l build/allure-results
 
 
-      - name: Upload Allure report as artifact
+      - name: Archive Allure report (correct structure)
+        run: |
+         cd build/reports/allure-report/allureReport
+         zip -r ../../../../allure-report.zip ./*
+
+      - name: Upload zipped Allure report
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report
-          path: build/reports/allure-report
+         name: allure-report
+         path: build/allure-report.zip
+
 
       - name: Generate donut chart from Allure summary
         run: node generateChart.js
