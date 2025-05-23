@@ -14,6 +14,8 @@ def allureVersion = "2.24.0" // Обновил до последнего
 allure {
     report {
         version.set(allureVersion)
+        clean.set(true)
+        outputDir.set(layout.buildDirectory.dir("allure-report"))
     }
     adapter {
         aspectjWeaver.set(true)
