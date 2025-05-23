@@ -8,7 +8,6 @@ const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
 const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
 
 const branch = process.env.GITHUB_REF_NAME || 'unknown';
-const time = process.env.TIME || 'неизвестно';
 const repo = process.env.REPO || 'unknown/repo';
 const runId = process.env.RUN_ID || '0';
 
@@ -16,6 +15,28 @@ const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const runResult = failed > 0 ? 'completed with errors' : 'passed';
 const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
+const rawTime = process.env.TIME || '';
+let formattedTime = 'неизвестно';
+
+if (rawTime) {
+  try {
+    // Парсинг строки в формате "DD.MM.YYYY HH:mm"
+    const [datePart, timePart] = rawTime.split(' ');
+    const [day, month, year] = datePart.split('.').map(Number);
+    const [hours, minutes] = timePart.split(':').map(Number);
+
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+    // Сдвигаем на +3 часа (МСК)
+    utcDate.setUTCHours(utcDate.getUTCHours() + 3);
+
+    formattedTime = utcDate.toLocaleString('ru-RU', {
+      timeZone: 'Europe/Moscow',
+      hour12: false
+    });
+  } catch {
+    formattedTime = rawTime;
+  }
+}
 
 function renderSteps(steps, indent = 0) {
   if (!steps) return '';
@@ -49,7 +70,7 @@ const message = `
 ✅ Scheduled run tests ${runResult}
 🧪 *Проект:* CoinsHistoryAPI
 🔗 [Репозиторий](https://github.com/${repo})
-🕒 *Время запуска:* ${time}
+🕒 *Время запуска:* ${formattedTime}
 🔁 *Бранч:* ${branch}
 ⚙️ *CI:* GitHub Actions
 
