@@ -48,17 +48,24 @@ jobs:
       - name: Generate Allure report
         run: ./gradlew allureReport
 
+      - name: Upload Allure report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: build/reports/allure-report
+
       - name: Generate donut chart from Allure summary
         run: node generateChart.js
 
       - name: Create Telegram message
         id: generate-message
         env:
-         GITHUB_REF_NAME: ${{ github.ref_name }}
-         TIME: ${{ steps.get-time.outputs.time }}
-         run: |
-           node generateMessage.js > message.txt
-
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          TIME: ${{ steps.get-time.outputs.time }}
+          RUN_ID: ${{ github.run_id }}
+          REPO: ${{ github.repository }}
+        run: |
+          node generateMessage.js > message.txt
 
       - name: Send chart and message to Telegram
         run: |
@@ -67,3 +74,4 @@ jobs:
             -F photo=@"allure-summary-chart.png" \
             -F caption="$(cat message.txt)" \
             -F parse_mode="Markdown"
+
