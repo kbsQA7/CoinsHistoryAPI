@@ -45,20 +45,13 @@ jobs:
         run: ./gradlew clean test
         continue-on-error: true
 
-      - name: Generate Allure report (via CLI)
+      - name: Generate Allure report (CLI)
         run: npx allure generate build/allure-results --clean -o build/allure-report
 
-
-      - name: Debug — check raw results
-        run: ls -l build/allure-results || echo "❌ No raw results"
-
-      - name: Debug — check generated Allure report
-        run: ls -l build/reports/allure-report/allureReport || echo "❌ No HTML report"
-
-      - name: Archive Allure report contents (clean zip)
+      - name: Archive Allure report for download
         run: |
-          cd build/reports/allure-report/allureReport
-          zip -r ../../../../allure-report.zip ./*
+          cd build/allure-report
+          zip -r ../allure-report.zip ./*
 
       - name: Upload zipped Allure report
         uses: actions/upload-artifact@v4
@@ -66,7 +59,7 @@ jobs:
           name: allure-report
           path: build/allure-report.zip
 
-      - name: Generate donut chart from Allure summary
+      - name: Generate donut chart
         run: node generateChart.js
 
       - name: Create Telegram message
@@ -76,8 +69,7 @@ jobs:
           TIME: ${{ steps.get-time.outputs.time }}
           RUN_ID: ${{ github.run_id }}
           REPO: ${{ github.repository }}
-        run: |
-          node generateMessage.js > message.txt
+        run: node generateMessage.js > message.txt
 
       - name: Send chart and message to Telegram
         run: |
