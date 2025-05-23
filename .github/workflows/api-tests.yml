@@ -55,18 +55,10 @@ jobs:
         run: ls -la allure-summary.png
 
 
-      - name: Send Telegram message with screenshot
-        if: always()
+      - name: Send chart to Telegram
         run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            STATUS="✅ API tests passed"
-          else
-            STATUS="❌ API tests failed"
-          fi
 
-          MESSAGE="${STATUS}%0ARepo: kbsQA7/CoinsHistoryAPI%0AWorkflow: API Tests%0ACommit: ${{ github.sha }}"
-
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendPhoto" \
-            -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-            -F photo=@"allure-summary.png" \
-            -F caption="${MESSAGE}"
+           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendPhoto" \
+             -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+             -F photo=@"allure-summary-chart.png" \
+             -F caption="📊 Allure Test Results"
