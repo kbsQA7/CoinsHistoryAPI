@@ -51,8 +51,9 @@ jobs:
       - name: Upload Allure report as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report
-          path: build/reports/allure-report
+         name: allure-report
+         path: build/allure-report
+
 
       - name: Generate donut chart from Allure summary
         run: node generateChart.js
