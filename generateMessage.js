@@ -11,30 +11,42 @@ const time = process.env.TIME || 'неизвестно';
 const repo = process.env.REPO || 'unknown/repo';
 const runId = process.env.RUN_ID || '0';
 
+const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
+const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
+const runResult = failed > 0 ? 'completed with errors' : 'passed';
+const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
+
+
+function renderSteps(steps, indent = 0) {
+  if (!steps) return '';
+  const pad = '  '.repeat(indent);
+  return steps.map(step => {
+    const icon =
+      step.status === 'passed' ? '✅' :
+      step.status === 'failed' ? '❌' :
+      step.status === 'skipped' ? '⏭' : '🔹';
+    let line = `${pad}- ${icon} ${step.name}`;
+    if (step.steps && step.steps.length > 0) {
+      line += '\n' + renderSteps(step.steps, indent + 1);
+    }
+    return line;
+  }).join('\n');
+}
+
+// 🧨 Сборка списка упавших тестов
 let failedTests = '';
 
 fs.readdirSync(testCasesDir).forEach(file => {
   const test = JSON.parse(fs.readFileSync(path.join(testCasesDir, file), 'utf-8'));
   if (test.status === 'failed') {
     failedTests += `\n*${test.name}*\n📝 Steps:\n`;
-    if (test.steps?.length) {
-      test.steps.forEach(step => {
-        const icon =
-          step.status === 'passed' ? '✅' :
-          step.status === 'failed' ? '❌' :
-          step.status === 'skipped' ? '⏭' : '🔹';
-        failedTests += `- ${icon} ${step.name}\n`;
-      });
+    if (test.steps && test.steps.length > 0) {
+      failedTests += renderSteps(test.steps) + '\n';
     } else {
       failedTests += `- ⚠️ Шаги не найдены\n`;
     }
   }
 });
-
-const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
-const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
-const runResult = failed > 0 ? 'completed with errors' : 'passed';
-const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
 
 const message = `
 ✅ Scheduled run tests ${runResult}
@@ -59,3 +71,4 @@ ${failedTests ? `🧨 *Упавшие тесты:*${failedTests}` : ''}
 `;
 
 console.log(message.trim());
+
