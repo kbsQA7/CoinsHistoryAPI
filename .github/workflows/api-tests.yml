@@ -3,7 +3,7 @@ name: API Tests (Manual + Scheduled)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 * * * *' 
 
 jobs:
   run-api-tests:
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: Install Puppeteer
         run: npm install
 
       - name: Install Allure CLI
