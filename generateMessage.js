@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
-const summary = JSON.parse(fs.readFileSync('build/reports/allure-report/allureReport/widgets/summary.json', 'utf-8'));
-const testCasesDir = 'build/reports/allure-report/allureReport/data/test-cases/';
-
+const summaryPath = 'build/allure-report/widgets/summary.json';
+const testCasesDir = 'build/allure-report/data/test-cases/';
+const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
 const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
 
 const branch = process.env.GITHUB_REF_NAME || 'unknown';
@@ -15,7 +15,6 @@ const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const logsLink = `https://github.com/${repo}/actions/runs/${runId}`;
 const runResult = failed > 0 ? 'completed with errors' : 'passed';
 const statusText = failed > 0 ? '🔴 Тесты с ошибками — требуется анализ.' : '🟢 Все тесты прошли успешно';
-
 
 function renderSteps(steps, indent = 0) {
   if (!steps) return '';
@@ -33,18 +32,12 @@ function renderSteps(steps, indent = 0) {
   }).join('\n');
 }
 
-// 🧨 Сборка списка упавших тестов
 let failedTests = '';
-
 fs.readdirSync(testCasesDir).forEach(file => {
   const test = JSON.parse(fs.readFileSync(path.join(testCasesDir, file), 'utf-8'));
   if (test.status === 'failed') {
     failedTests += `\n*${test.name}*\n📝 Steps:\n`;
-    if (test.steps && test.steps.length > 0) {
-      failedTests += renderSteps(test.steps) + '\n';
-    } else {
-      failedTests += `- ⚠️ Шаги не найдены\n`;
-    }
+    failedTests += test.steps?.length ? renderSteps(test.steps) : '- ⚠️ Шаги не найдены\n';
   }
 });
 
@@ -71,4 +64,5 @@ ${failedTests ? `🧨 *Упавшие тесты:*${failedTests}` : ''}
 `;
 
 console.log(message.trim());
+
 
