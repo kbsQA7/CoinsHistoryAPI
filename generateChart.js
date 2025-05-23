@@ -29,14 +29,12 @@ const html = `
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-      canvas {
-        margin: 20px;
+        height: 100vh;
       }
     </style>
   </head>
   <body>
-    <canvas id="chart" width="800" height="800"></canvas>
+    <canvas id="chart" width="600" height="600"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script>
@@ -57,16 +55,25 @@ const html = `
           }]
         },
         options: {
+          layout: {
+            padding: {
+              top: 30,
+              bottom: 30
+            }
+          },
           plugins: {
             datalabels: {
               color: '#fff',
               font: {
                 weight: 'bold',
-                size: 18
+                size: 12
               },
               formatter: (value, ctx) => {
-                return ctx.chart.data.labels[ctx.dataIndex];
-              }
+                return value > 0 ? ctx.chart.data.labels[ctx.dataIndex] : '';
+              },
+              anchor: 'center',
+              align: 'center',
+              offset: 0
             },
             legend: {
               display: true,
@@ -76,7 +83,7 @@ const html = `
               display: true,
               text: 'Allure Test Results Summary',
               font: {
-                size: 22
+                size: 20
               }
             },
             tooltip: {
@@ -104,5 +111,6 @@ await page.screenshot({ path: 'allure-summary-chart.png' });
 await browser.close();
 
 console.log('✅ Диаграмма успешно сгенерирована: allure-summary-chart.png');
+
 
 
