@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Путь к summary.json
 const summaryPath = path.join(__dirname, 'build', 'reports', 'allure-report', 'allureReport', 'widgets', 'summary.json');
 
 if (!fs.existsSync(summaryPath)) {
@@ -16,7 +15,6 @@ if (!fs.existsSync(summaryPath)) {
 
 const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
 const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
-
 
 const html = `
 <!DOCTYPE html>
@@ -32,6 +30,9 @@ const html = `
         align-items: center;
         justify-content: center;
       }
+      canvas {
+        margin: 20px;
+      }
     </style>
   </head>
   <body>
@@ -42,7 +43,11 @@ const html = `
       new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['✅ Passed', '❌ Failed', '⚠️ Skipped'],
+          labels: [
+            '✅ Passed: ${passed}', 
+            '❌ Failed: ${failed}', 
+            '⚠️ Skipped: ${skipped}'
+          ],
           datasets: [{
             label: 'Test Results',
             data: [${passed}, ${failed}, ${skipped}],
@@ -53,12 +58,22 @@ const html = `
         },
         options: {
           plugins: {
-            legend: { position: 'bottom' },
+            legend: {
+              display: true,
+              position: 'bottom'
+            },
             title: {
               display: true,
               text: 'Allure Test Results Summary',
               font: {
                 size: 22
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.label; // Показывает: "❌ Failed: 2"
+                }
               }
             }
           }
@@ -72,7 +87,6 @@ const html = `
 const htmlPath = path.join(__dirname, 'temp_chart.html');
 fs.writeFileSync(htmlPath, html);
 
-
 const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
 const page = await browser.newPage();
 
@@ -81,3 +95,4 @@ await page.screenshot({ path: 'allure-summary-chart.png' });
 await browser.close();
 
 console.log('✅ Диаграмма успешно сгенерирована: allure-summary-chart.png');
+
