@@ -45,8 +45,20 @@ jobs:
         run: ./gradlew clean test
         continue-on-error: true
 
+        
       - name: Generate Allure report
         run: ./gradlew allureReport
+        
+      - name: Debug — проверить структуру build/
+        run: |
+         echo "🔍 Список файлов в build:"
+         ls -R build
+
+         - name: Debug — ищем summary.json
+           run: |
+           echo "🔍 Поиск summary.json..."
+           find build -type f -name summary.json
+
 
       - name: Upload Allure report as artifact
         uses: actions/upload-artifact@v4
