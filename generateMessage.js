@@ -8,19 +8,26 @@ const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
 const { passed = 0, failed = 0, skipped = 0 } = summary.statistic;
 
 const branch = process.env.GITHUB_REF_NAME || 'unknown';
-const timeRaw = process.env.TIME || '';
 const repo = process.env.REPO || 'unknown/repo';
 const runId = process.env.RUN_ID || '0';
 
+const rawTime = process.env.TIME || '';
 let formattedTime = 'неизвестно';
-if (/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}:\d{2}$/.test(timeRaw)) {
-  const [datePart, timePart] = timeRaw.split(' ');
-  const [day, month, year] = datePart.split('.').map(Number);
-  const [hours, minutes, seconds] = timePart.split(':').map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
-  date.setUTCHours(date.getUTCHours() + 3);
-  const pad = (n) => n.toString().padStart(2, '0');
-  formattedTime = `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+
+if (rawTime) {
+  try {
+    const [datePart, timePart] = rawTime.split(' ');
+    const [day, month, year] = datePart.split('.').map(Number);
+    const [hours, minutes] = timePart.split(':').map(Number);
+
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+    utcDate.setUTCHours(utcDate.getUTCHours() + 3); // Сдвиг на МСК
+
+    const pad = (n) => n.toString().padStart(2, '0');
+    formattedTime = `${pad(utcDate.getDate())}.${pad(utcDate.getMonth() + 1)}.${utcDate.getFullYear()} ${pad(utcDate.getHours())}:${pad(utcDate.getMinutes())}`;
+  } catch {
+    formattedTime = rawTime;
+  }
 }
 
 const allureLink = `https://github.com/${repo}/actions/runs/${runId}`;
@@ -46,7 +53,7 @@ const message = `
 ✅ Scheduled run tests ${runResult}
 🧪 *Проект:* CoinsHistoryAPI
 🔗 [Репозиторий](https://github.com/${repo})
-🕒 *Время запуска:* ${formattedTime}
+🕒 *Время запуска:* ${rawTime}
 🔁 *Бранч:* ${branch}
 ⚙️ *CI:* GitHub Actions
 
