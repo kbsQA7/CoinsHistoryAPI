@@ -33,22 +33,13 @@ if (fs.existsSync(testCasesDir)) {
   fs.readdirSync(testCasesDir).forEach(file => {
     const test = JSON.parse(fs.readFileSync(path.join(testCasesDir, file), 'utf-8'));
     if (test.status === 'failed') {
-  failedTests += `\n*${test.name || '[Без имени]'}*`;
-
-  const errorMsg = test.statusDetails?.message?.trim();
-  if (errorMsg) {
-    const firstLine = errorMsg.split('\n')[0];
-    failedTests += `\n💥 ${firstLine}`;
-  }
-
-  const trace = test.statusDetails?.trace?.trim();
-  if (trace) {
-    const traceLine = trace.split('\n')[0];
-    failedTests += `\n🧵 ${traceLine}`;
-  }
-
-  failedTests += '\n';
+      failedTests += `\n*${test.name || '[Без имени]'}*`;
+    }
+  });
 }
+                                                                         
+
+                                
 
 
 const message = `
