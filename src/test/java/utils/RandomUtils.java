@@ -41,7 +41,7 @@ public class RandomUtils {
 
 
     public static String randomTimeFrame() {
-        String[] frames = {"1H", "1D", "1W", "1M", "3M", "6M", "YTD", "1Y", "ALL"};
+        String[] frames = {"1H", "1D", "1W", "1M", "3M", "6M", "YTD", "1Y"};
         int idx = ThreadLocalRandom.current().nextInt(frames.length);
         return frames[idx];
     }
