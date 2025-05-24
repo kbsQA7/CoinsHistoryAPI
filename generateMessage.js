@@ -18,10 +18,10 @@ if (rawTime) {
   try {
     const [datePart, timePart] = rawTime.split(' ');
     const [day, month, year] = datePart.split('.').map(Number);
-    const [hours, minutes] = timePart.split(':').map(Number);
+    const [hours, minutes, seconds = 0] = timePart.split(':').map(Number);
 
-    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
-    utcDate.setUTCHours(utcDate.getUTCHours() + 6); // Сдвиг на МСК
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
+    utcDate.setUTCHours(utcDate.getUTCHours() + 6); // Сдвиг на МСК (UTC+3 → UTC+6 как ты указал)
 
     const pad = (n) => n.toString().padStart(2, '0');
     formattedTime = `${pad(utcDate.getDate())}.${pad(utcDate.getMonth() + 1)}.${utcDate.getFullYear()} ${pad(utcDate.getHours())}:${pad(utcDate.getMinutes())}`;
