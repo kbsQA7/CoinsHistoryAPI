@@ -53,7 +53,7 @@ const message = `
 ✅ Scheduled run tests ${runResult}
 🧪 *Проект:* CoinsHistoryAPI
 🔗 [Репозиторий](https://github.com/${repo})
-🕒 *Время запуска:* ${rawTime}
+🕒 *Время запуска:* ${formattedTime}
 🔁 *Бранч:* ${branch}
 ⚙️ *CI:* GitHub Actions
 
